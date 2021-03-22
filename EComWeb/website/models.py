@@ -1,8 +1,8 @@
 from django.db import models
-from django.shortcuts import reverse
 from django.conf import settings
 
 class Category(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length = 50, unique = True)
     slug = models.SlugField(default = "test-category", unique = True)
 
@@ -12,15 +12,11 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
-        return self.slug
-
-
 class Product(models.Model):
-    imgProductImage = models.ImageField(upload_to='productImages/', default = 'default.png')
+    img = models.ImageField(upload_to='productImages/', default = 'default.png')
     title = models.CharField(max_length = 50, unique = True)
     price = models.FloatField()
-    discountPrice = models.FloatField(blank = True, null = True)
+    discounted_price = models.FloatField(blank = True, null = True)
     category = models.ForeignKey(Category, related_name = "products", on_delete = models.CASCADE, default = 0)
     slug = models.SlugField(default = "test-product", unique = True)
     description = models.TextField(default = "This is a the place where you have to enter the description about the product. Like the ingredients used how popular the product is")
@@ -34,12 +30,8 @@ class Product(models.Model):
     def displayDescription(self):
         return self.description.split('\\n')
 
-    def get_add_to_cart_url(self):
-        return reverse("webiste:add_to_cart", kwargs={'slug': self.slug,})
-        #return f'/{self.category.slug}/{self.slug}'
-
     def get_single_save(self):
-        return self.price - self.discountPrice
+        return self.price - self.discounted_price
 
 class OrderItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -55,13 +47,13 @@ class OrderItem(models.Model):
         return self.quantity * self.item.price
 
     def get_total_discount_item_price(self):
-        return self.quantity * self.item.discountPrice
+        return self.quantity * self.item.discounted_price
 
     def get_amount_saved(self):
         return self.get_total_item_price() - self.get_total_discount_item_price()
 
     def get_final_price(self):
-        if self.item.discountPrice:
+        if self.item.discounted_price:
             return self.get_total_discount_item_price()
         return self.get_total_item_price()
 
@@ -103,7 +95,7 @@ class Order(models.Model):
     def get_total_savings(self):
         savings = 0
         for order_item in self.items.all():
-            if order_item.item.discountPrice:
+            if order_item.item.discounted_price:
                 savings += order_item.get_amount_saved()
 
         if self.coupon:
