@@ -12,7 +12,7 @@
       <!--Grid column-->
       <div class="col-md-6 mb-4">
 
-        <img src="{{product.imgProductImage.url}}" class="img-fluid" alt="">
+        <img src="{{product.img.url}}" class="img-fluid" alt="">
 
       </div>
       <!--Grid column-->
@@ -34,11 +34,11 @@
           <!-- <p class="lead"> -->
             <h2 style="color:black;">
               <strong>
-                {% if product.discountPrice %}
+                {% if product.discounted_price %}
                 <span class="mr-1">
                   <del>₹ {{product.price}}</del>
                 </span>
-                <span>₹ {{product.discountPrice}}</span>
+                <span>₹ {{product.discounted_price}}</span>
                 {% else %}
                 <span >₹ {{product.price}}</span>
                 {% endif %}
@@ -103,7 +103,7 @@
         <div class="card">
           <!--Card image-->
           <div class="view overlay">
-            <img class="card-img-top" src="{{relatedPro.imgProductImage.url}}">
+            <img class="card-img-top" src="{{relatedPro.img.url}}">
             <a href="{{relatedPro.get_absolute_url}}"  >
               <div class="mask rgba-white-slight"></div>
             </a>
@@ -121,8 +121,8 @@
             </h5>
             <h4 class="font-weight-bold blue-text">
               <strong>₹
-                {% if relatedPro.discountPrice %}
-                {{relatedPro.discountPrice}}
+                {% if relatedPro.discounted_price %}
+                {{relatedPro.discounted_price}}
                 {% else %}
                 {{relatedPro.price}}
                 {%endif %}

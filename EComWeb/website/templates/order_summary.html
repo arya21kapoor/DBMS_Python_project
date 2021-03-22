@@ -22,8 +22,8 @@
             <th scope="row">{{ forloop.counter }}</th>
             <td><a href="{{order_item.item.get_absolute_url}}">{{order_item.item.title}}</a></td>
             <td>
-              {% if order_item.item.discountPrice %}
-              ₹ {{order_item.item.discountPrice}}
+              {% if order_item.item.discounted_price %}
+              ₹ {{order_item.item.discounted_price}}
               <span class="badge badge-primary">Saving ₹ {{ order_item.item.get_single_save }}</span>
               {%else%}
               ₹ {{order_item.item.price}}
@@ -35,7 +35,7 @@
               <a href="{% url 'website:add_to_cart' order_item.item.category.slug order_item.item.slug %}"><i class="fas fa-plus ml-2"></i></a>
             </td>
             <td>
-              {% if order_item.item.discountPrice %}
+              {% if order_item.item.discounted_price %}
               ₹ {{ order_item.get_total_discount_item_price }}
               <span class="badge badge-primary">Saving ₹ {{ order_item.get_amount_saved }}</span>
               {% else %}

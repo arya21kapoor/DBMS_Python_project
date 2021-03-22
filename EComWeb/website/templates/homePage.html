@@ -52,7 +52,7 @@
         <div class="card">
           <!--Card image-->
           <div class="view overlay">
-            <img class="card-img-top" src="{{product.imgProductImage.url}}">
+            <img class="card-img-top" src="{{product.img.url}}">
             <a href="{{product.get_absolute_url}}"  >
               <div class="mask rgba-white-slight"></div>
             </a>
@@ -71,8 +71,8 @@
             </h5>
             <h4 class="font-weight-bold blue-text">
               <strong>₹
-                {% if product.discountPrice %}
-                {{product.discountPrice}}
+                {% if product.discounted_price %}
+                {{product.discounted_price}}
                 {% else %}
                 {{product.price}}
                 {%endif %}

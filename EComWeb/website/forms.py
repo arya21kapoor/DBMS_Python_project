@@ -1,8 +1,5 @@
 from django import forms
-from allauth.account.forms import SignupForm#, AuthenticationForm
-
-# class CustomLoginForm(AuthenticationForm):
-#     pass
+from allauth.account.forms import SignupForm
 
 class CustomSignupForm(SignupForm):
     first_name = forms.CharField(max_length=30, label='First Name', widget=forms.TextInput(attrs={'placeholder': 'First Name'}))
@@ -14,10 +11,7 @@ class CustomSignupForm(SignupForm):
 
         self.fields["password2"].widget.attrs["placeholder"] = "Confirm Password"
         self.fields["password2"].label = "Confirm Password"
-        # self.fields["username"].widget.attrs["placeholder"]
-        # print(self.fields["username"].widget.__dict__)
-        # print(self.fields["username"].widget.attrs["placeholder"])
-
+        
     def signup(self, request, user):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']

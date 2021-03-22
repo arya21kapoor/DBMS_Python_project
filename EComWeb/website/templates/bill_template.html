@@ -137,15 +137,15 @@
             <th scope="row">{{ forloop.counter }}</th>
             <td style="color:blue;">{{order_item.item.title}}</td>
             <td>
-              <!-- {% if order_item.item.discountPrice %}
-              Rs  {{order_item.item.discountPrice}}
+              <!-- {% if order_item.item.discounted_price %}
+              Rs  {{order_item.item.discounted_price}}
               {%else%}
               Rs  {{order_item.item.price}}
               {%endif %} -->
               Rs  {{order_item.item.price}}
               <td>
-                {% if order_item.item.discountPrice %}
-                Rs  {{order_item.item.discountPrice}}
+                {% if order_item.item.discounted_price %}
+                Rs  {{order_item.item.discounted_price}}
                 {%else%}
                 -
                 {%endif %}
@@ -155,7 +155,7 @@
               {{ order_item.quantity }}
             </td>
             <td>
-              {% if order_item.item.discountPrice %}
+              {% if order_item.item.discounted_price %}
               Rs  {{ order_item.get_total_discount_item_price }}
               {% else %}
               Rs  {{ order_item.get_total_item_price }}
