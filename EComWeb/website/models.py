@@ -3,7 +3,7 @@ from django.shortcuts import reverse
 from django.conf import settings
 
 class Category(models.Model):
-    title = models.CharField(max_length = 100, unique = True)
+    title = models.CharField(max_length = 50, unique = True)
     slug = models.SlugField(default = "test-category", unique = True)
 
     class Meta:
@@ -18,7 +18,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     imgProductImage = models.ImageField(upload_to='productImages/', default = 'default.png')
-    title = models.CharField(max_length = 100, unique = True)
+    title = models.CharField(max_length = 50, unique = True)
     price = models.FloatField()
     discountPrice = models.FloatField(blank = True, null = True)
     category = models.ForeignKey(Category, related_name = "products", on_delete = models.CASCADE, default = 0)
@@ -46,6 +46,7 @@ class OrderItem(models.Model):
     item = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
+    done = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.quantity} of {self.item.title}'
