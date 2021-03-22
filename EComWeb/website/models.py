@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
@@ -11,6 +12,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Product(models.Model):
     img = models.ImageField(upload_to='productImages/', default = 'default.png')
@@ -61,6 +63,7 @@ class OrderItem(models.Model):
             return self.get_total_discount_price_for_item()
         return self.get_total_item_price()
 
+
 class Order(models.Model):
     order_unique_num = models.CharField(max_length = 10, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -88,7 +91,7 @@ class Order(models.Model):
             total -= self.coupon.amount
         return total
 
-    def get_total_cart_items(self):
+    def get_cart_items_num(self):
         sum = 0
         if self.items.exists():
             sum = 0
@@ -114,11 +117,13 @@ class Payment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} --> ₹  {self.amount}"
+
 
 class Coupon(models.Model):
     coupon_code = models.CharField(max_length = 20, unique = True)
     amount = models.FloatField()
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.coupon_code

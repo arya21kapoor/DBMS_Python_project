@@ -6,42 +6,53 @@ from django.contrib.auth.models import Group
 # Below classes are for better display of the admin
 # Also for filtering according to the different fields
 
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['title']
 
+
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'price', 'discounted_price', 'category']
     list_filter = ['category']
 
+
+@admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
+    readonly_fields = ['user', 'item', 'quantity']
+    fields = ['user', 'item', 'quantity', 'ordered', 'done']
     list_display = ['item', 'quantity', 'done', 'user']
     list_filter = ['done']
+    list_editable = ['done']
 
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    readonly_fields = ['order_unique_num', 'user', 'items', 'ordered_date', 'payment', 'coupon', 'shipping_address', 'billing_address', 'ordered']
+    fields = ['order_unique_num', 'user', 'items', 'ordered_date', 'payment', 'coupon', 'shipping_address', 'billing_address', 'ordered', 'delivered']
+    list_display = ['user', 'payment', 'ordered', 'delivered']
+    list_filter = ['user','ordered', 'delivered']
+    list_editable =['delivered']
+
+
+@admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    readonly_fields = ['stripe_charge_id', 'user', 'amount', 'timestamp']
     list_display = ['user', 'amount', 'timestamp']
     list_filter = ['user']
 
-class CouponAdmin(admin.ModelAdmin):
-    list_display = ['coupon_code', 'amount']
 
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ['coupon_code', 'amount', 'active']
+    list_editable =['active']
+
+
+@admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
+    readonly_fields = ['user', 'address_1', 'address_2', 'city', 'state', 'zip', 'address_type', 'default', 'used']
     list_display = ['user', 'address_1', 'address_2', 'city', 'state', 'zip', 'address_type', 'default', 'used' ]
     list_filter = ['user', 'default', 'address_type']
 
-class OrderAdmin(admin.ModelAdmin):
-    readonly_fields = ['order_unique_num', 'user', 'items', 'ordered_date', 'payment', 'coupon',
-    'shipping_address', 'billing_address']
-    fields = ['order_unique_num', 'user', 'items', 'ordered_date', 'payment', 'coupon',
-    'shipping_address', 'billing_address', 'ordered', 'delivered']
-    list_display = ['user', 'payment', 'ordered', 'delivered']
-    list_filter = ['user','ordered', 'delivered']
 
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Product, ProductAdmin)
-admin.site.register(OrderItem, OrderItemAdmin)
-admin.site.register(Order, OrderAdmin)
-admin.site.register(Payment, PaymentAdmin)
-admin.site.register(Coupon, CouponAdmin)
-admin.site.register(Address, AddressAdmin)
-
-admin.site.unregister(Group) # not imp not now
+admin.site.unregister(Group) # not imp for now

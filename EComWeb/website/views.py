@@ -613,7 +613,12 @@ class AddCouponView(LoginRequiredMixin, View):
                 order = Order.objects.get(user=self.request.user, ordered=False)
                 try:
                      coupon = Coupon.objects.get(coupon_code=code)
-                     couponDiscount = Coupon.objects.get(coupon_code = code).amount
+
+                     if not coupon.active:
+                         messages.info(self.request, "Coupon is NOT Active")
+                         return redirect("website:order-summary")
+
+                     couponDiscount = coupon.amount
 
                      if order.get_total_without_coupon() - couponDiscount < 0:
                          messages.info(self.request, "Coupon not valid for this Bill Amount")

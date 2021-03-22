@@ -137,11 +137,6 @@
             <th scope="row">{{ forloop.counter }}</th>
             <td style="color:blue;">{{order_item.item.title}}</td>
             <td>
-              <!-- {% if order_item.item.discounted_price %}
-              Rs  {{order_item.item.discounted_price}}
-              {%else%}
-              Rs  {{order_item.item.price}}
-              {%endif %} -->
               Rs  {{order_item.item.price}}
               <td>
                 {% if order_item.item.discounted_price %}
