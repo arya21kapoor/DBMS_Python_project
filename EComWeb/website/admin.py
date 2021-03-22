@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import Product, Category, OrderItem, Order, Payment, Coupon, Address
 from django.contrib.auth.models import Group
 
-# Below classes are made for better display of the admin
+# Below classes are for better display of the admin
 # Also for filtering according to the different fields
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -25,28 +25,12 @@ class CouponAdmin(admin.ModelAdmin):
     list_display = ['coupon_code', 'amount']
 
 class AddressAdmin(admin.ModelAdmin):
-    list_display = [
-        'user',
-        'address_1',
-        'address_2',
-        'city',
-        'state',
-        'zip',
-        'address_type',
-        'default',
-        'used'
-    ]
+    list_display = ['user', 'address_1', 'address_2', 'city', 'state', 'zip', 'address_type', 'default', 'used' ]
     list_filter = ['user', 'default', 'address_type']
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = [
-        'user',
-        'payment',
-        'ordered',
-        'delivered',
-    ]
-    list_filter = ['user','ordered', 'delivered',]
-
+    list_display = ['user', 'payment', 'ordered', 'delivered']
+    list_filter = ['user','ordered', 'delivered']
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -56,4 +40,4 @@ admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Coupon, CouponAdmin)
 admin.site.register(Address, AddressAdmin)
 
-admin.site.unregister(Group)
+admin.site.unregister(Group) # not imp not now
