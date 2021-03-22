@@ -58,16 +58,17 @@ class OrderItem(models.Model):
         return self.get_total_item_price()
 
 class Order(models.Model):
+    order_unique_num = models.CharField(max_length = 10, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     items = models.ManyToManyField(OrderItem)
     ordered_date = models.DateTimeField()
-    ordered = models.BooleanField(default=False)
-    delivered = models.BooleanField(default=False)
     payment = models.ForeignKey('Payment', on_delete = models.SET_NULL, blank = True, null = True )
     coupon = models.ForeignKey('Coupon', on_delete = models.SET_NULL, blank = True, null = True)
     shipping_address = models.ForeignKey('Address', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('Address', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
-    order_unique_num = models.CharField(max_length = 10, blank=True, null=True)
+    ordered = models.BooleanField(default=False)
+    delivered = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.user.username
@@ -137,7 +138,7 @@ class Address(models.Model):
     used = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username
+        return f'{self.address_1}\n{self.address_2}\n{self.city}, {self.state} - {self.zip}\n'
 
     class Meta:
         verbose_name_plural = 'Addresses'

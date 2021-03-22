@@ -17,8 +17,8 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from .utils import random_string_generator
 
-stripe.api_key = 'sk_test_51IWcUlH2WUN2XCq1cM00PM5AOtkcShLPtwl1bg5C1SxYwJL0g7Jl29UqzWt6qWyZvCcqkApZV3U2aXxq2ZJRTXHC00n6nvgzbm'
-
+# stripe.api_key = 'sk_test_51IWcUlH2WUN2XCq1cM00PM5AOtkcShLPtwl1bg5C1SxYwJL0g7Jl29UqzWt6qWyZvCcqkApZV3U2aXxq2ZJRTXHC00n6nvgzbm'
+stripe.api_key = 'sk_test_51IXi0FSDx5m6eXW3KfjVvvE6Rf0YSo0qCNkvalLxYvmJZ6yozVZEkvJejNo3Fe6VkQ4Js1gGL3cfY4ssEGrcQVs400oRZwpHDg'
 class OrderSummaryView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         try:
@@ -32,58 +32,108 @@ class OrderSummaryView(LoginRequiredMixin, View):
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
 
-def homePageFunction (request):
-    products_list = Product.objects.all()
-    page = request.GET.get('page', 1)
-    paginator = Paginator(products_list, 6)
+class HomePage(View):
+    def get(self, *args, **kwargs):
+        products_list = Product.objects.all()
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(products_list, 8)
 
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
 
-    context = {
-        'products': products
-    }
-    return render (request, 'homePage.html', context)
+        context = {'products': products}
+
+        return render(self.request, 'homePage.html', context)
+
+# def homePageFunction (request):
+#     products_list = Product.objects.all()
+#     page = request.GET.get('page', 1)
+#     paginator = Paginator(products_list, 6)
+#
+#     try:
+#         products = paginator.page(page)
+#     except PageNotAnInteger:
+#         products = paginator.page(1)
+#     except EmptyPage:
+#         products = paginator.page(paginator.num_pages)
+#
+#     context = {
+#         'products': products
+#     }
+#     return render (request, 'homePage.html', context)
 
 
-def productDetailFunction(request, category_slug, slug):
+class ProductDetail(View):
+    def get(self, *args, **kwargs):
+        product = get_object_or_404(Product, slug=kwargs['slug'])
 
-    product = get_object_or_404(Product, slug=slug)
+        related_products = list(product.category.products.exclude(id=product.id))
 
-    related_products = list(product.category.products.exclude(id=product.id))
+        if len(related_products) > 4:
+            related_products = random.sample(related_products, 4)
 
-    if len(related_products) > 4:
-        related_products = random.sample(related_products, 4)
+        context = {'product':product, 'related_products': related_products}
 
-    context = {
-    'product':product,
-    'related_products': related_products
-    }
+        return render (self.request, 'productPage.html', context)
 
-    return render (request, 'productPage.html', context)
 
-def categoryDetailFunction(request, slug):
+# def productDetailFunction(request, category_slug, slug):
+#
+#     product = get_object_or_404(Product, slug=slug)
+#
+#     related_products = list(product.category.products.exclude(id=product.id))
+#
+#     if len(related_products) > 4:
+#         related_products = random.sample(related_products, 4)
+#
+#     context = {
+#     'product':product,
+#     'related_products': related_products
+#     }
+#
+#     return render (request, 'productPage.html', context)
 
-    category = get_object_or_404(Category, slug = slug)
-    products_list = category.products.all()
-    page = request.GET.get('page', 1)
-    paginator = Paginator(products_list, 6)
+class CategoryDetail(View):
+    def get(self, *args, **kwargs):
+        category = get_object_or_404(Category, slug = kwargs['slug'])
+        products_list = category.products.all()
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(products_list, 6)
 
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
 
-    context = {
-        'products': products
-    }
-    return render (request, 'homePage.html', context)
+        context = {
+            'products': products
+        }
+        return render (self.request, 'homePage.html', context)
+
+# def categoryDetailFunction(request, slug):
+#
+#     category = get_object_or_404(Category, slug = slug)
+#     products_list = category.products.all()
+#     page = request.GET.get('page', 1)
+#     paginator = Paginator(products_list, 6)
+#
+#     try:
+#         products = paginator.page(page)
+#     except PageNotAnInteger:
+#         products = paginator.page(1)
+#     except EmptyPage:
+#         products = paginator.page(paginator.num_pages)
+#
+#     context = {
+#         'products': products
+#     }
+#     return render (request, 'homePage.html', context)
 
 @login_required
 def add_to_cart(request, category_slug, slug):

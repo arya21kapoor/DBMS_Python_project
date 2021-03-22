@@ -10,7 +10,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ['title']
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'price', 'discountPrice', 'category']
+    list_display = ['title', 'price', 'discounted_price', 'category']
     list_filter = ['category']
 
 class OrderItemAdmin(admin.ModelAdmin):
@@ -29,6 +29,10 @@ class AddressAdmin(admin.ModelAdmin):
     list_filter = ['user', 'default', 'address_type']
 
 class OrderAdmin(admin.ModelAdmin):
+    readonly_fields = ['order_unique_num', 'user', 'items', 'ordered_date', 'payment', 'coupon',
+    'shipping_address', 'billing_address']
+    fields = ['order_unique_num', 'user', 'items', 'ordered_date', 'payment', 'coupon',
+    'shipping_address', 'billing_address', 'ordered', 'delivered']
     list_display = ['user', 'payment', 'ordered', 'delivered']
     list_filter = ['user','ordered', 'delivered']
 
