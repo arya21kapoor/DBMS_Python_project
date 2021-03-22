@@ -19,18 +19,21 @@ class Product(models.Model):
     discounted_price = models.FloatField(blank = True, null = True)
     category = models.ForeignKey(Category, related_name = "products", on_delete = models.CASCADE, default = 0)
     slug = models.SlugField(default = "test-product", unique = True)
-    description = models.TextField(default = "This is a the place where you have to enter the description about the product. Like the ingredients used how popular the product is")
+    description = models.TextField(default = " Please enter the description about the product. It should give an overview about the product, how popular the product is and so on..")
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
+        """ returns URL compatable Category and Product slug"""
         return f'/{self.category.slug}/{self.slug}'
 
     def displayDescription(self):
+        """ returns Description of Product in formatted form for display"""
         return self.description.split('\\n')
 
-    def get_single_save(self):
+    def get_single_savings(self):
+        """returns discount on singular product"""
         return self.price - self.discounted_price
 
 class OrderItem(models.Model):

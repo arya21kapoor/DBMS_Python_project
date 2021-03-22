@@ -24,7 +24,7 @@
             <td>
               {% if order_item.item.discounted_price %}
               ₹ {{order_item.item.discounted_price}}
-              <span class="badge badge-primary">Saving ₹ {{ order_item.item.get_single_save }}</span>
+              <span class="badge badge-primary">Saving ₹ {{ order_item.item.get_single_savings }}</span>
               {%else%}
               ₹ {{order_item.item.price}}
               {%endif %}
