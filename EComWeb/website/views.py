@@ -497,7 +497,7 @@ class PaymentView(LoginRequiredMixin, View):
 
     def post(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
-        amount = int(order.get_total() * 100)
+        amount = int(order.get_grand_total() * 100)
         token = self.request.POST.get('stripeToken')
 
         try:
@@ -510,7 +510,7 @@ class PaymentView(LoginRequiredMixin, View):
             payment = Payment()
             payment.stripe_charge_id = charge['id']
             payment.user = self.request.user
-            payment.amount = order.get_total()
+            payment.amount = order.get_grand_total()
             payment.save()
 
             order_items = order.items.all()

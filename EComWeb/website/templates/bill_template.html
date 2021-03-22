@@ -156,7 +156,7 @@
             </td>
             <td>
               {% if order_item.item.discounted_price %}
-              Rs  {{ order_item.get_total_discount_item_price }}
+              Rs  {{ order_item.get_total_discount_price_for_item }}
               {% else %}
               Rs  {{ order_item.get_total_item_price }}
               {% endif %}
@@ -177,10 +177,10 @@
           <td><b>- Rs {{order.coupon.amount}}</b></td>
         </tr>
         {% endif %}
-        {% if order.get_total %}
+        {% if order.get_grand_total %}
         <tr class = "myCustomFontCell">
           <td colspan="5"><b>Order Total</b></td>
-          <td><b>Rs {{ order.get_total }}</b></td>
+          <td><b>Rs {{ order.get_grand_total }}</b></td>
         </tr>
         <tr class = "myCustomFontCell">
           <td colspan="5"><b>Total Savings</b></td>

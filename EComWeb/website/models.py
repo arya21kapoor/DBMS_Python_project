@@ -42,6 +42,7 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
     done = models.BooleanField(default=False)
+    # "done" is used by the admin for his/her reference. Can be used in the code for future implementation
 
     def __str__(self):
         return f'{self.quantity} of {self.item.title}'
@@ -49,15 +50,15 @@ class OrderItem(models.Model):
     def get_total_item_price(self):
         return self.quantity * self.item.price
 
-    def get_total_discount_item_price(self):
+    def get_total_discount_price_for_item(self):
         return self.quantity * self.item.discounted_price
 
     def get_amount_saved(self):
-        return self.get_total_item_price() - self.get_total_discount_item_price()
+        return self.get_total_item_price() - self.get_total_discount_price_for_item()
 
     def get_final_price(self):
         if self.item.discounted_price:
-            return self.get_total_discount_item_price()
+            return self.get_total_discount_price_for_item()
         return self.get_total_item_price()
 
 class Order(models.Model):
@@ -72,7 +73,6 @@ class Order(models.Model):
     ordered = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
 
-
     def __str__(self):
         return self.user.username
 
@@ -82,7 +82,7 @@ class Order(models.Model):
             total += order_item.get_final_price()
         return total
 
-    def get_total(self):
+    def get_grand_total(self):
         total = self.get_total_without_coupon()
         if self.coupon:
             total -= self.coupon.amount

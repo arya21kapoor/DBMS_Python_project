@@ -36,7 +36,7 @@
             </td>
             <td>
               {% if order_item.item.discounted_price %}
-              ₹ {{ order_item.get_total_discount_item_price }}
+              ₹ {{ order_item.get_total_discount_price_for_item }}
               <span class="badge badge-primary">Saving ₹ {{ order_item.get_amount_saved }}</span>
               {% else %}
               ₹ {{ order_item.get_total_item_price }}
@@ -67,10 +67,10 @@
             </td>
           </tr>
           {% endif %}
-          {% if object.get_total %}
+          {% if object.get_grand_total %}
           <tr>
             <td colspan="4"><b>Order Total</b></td>
-            <td><b style="font-weight:bold;">₹ {{ object.get_total }}</b>
+            <td><b style="font-weight:bold;">₹ {{ object.get_grand_total }}</b>
               {% if object.get_total_savings %}
               <span class="badge badge-primary">Saving ₹ {{ object.get_total_savings }}</span>
               {% endif %}
