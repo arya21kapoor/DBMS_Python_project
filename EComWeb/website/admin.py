@@ -17,6 +17,13 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['item', 'quantity', 'done', 'user']
     list_filter = ['done']
 
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'amount', 'timestamp']
+    list_filter = ['user']
+
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ['coupon_code', 'amount']
+
 class AddressAdmin(admin.ModelAdmin):
     list_display = [
         'user',
@@ -45,8 +52,8 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Order, OrderAdmin)
-admin.site.register(Payment)
-admin.site.register(Coupon)
+admin.site.register(Payment, PaymentAdmin)
+admin.site.register(Coupon, CouponAdmin)
 admin.site.register(Address, AddressAdmin)
 
 admin.site.unregister(Group)
