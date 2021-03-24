@@ -1,36 +1,26 @@
-import random
-import stripe
-from django.conf import settings
-from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import View
-from .models import Product, Category, OrderItem, Order, Payment, Coupon, Address
-from .forms import CouponForm, CheckoutForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required # used in functions
+from django.contrib.auth.mixins import LoginRequiredMixin # used in Class Based Views
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import get_template
 from django.utils import timezone
-from django.contrib import messages
+from django.views.generic import View
+
+import random
+import stripe
 from io import BytesIO
-from django.http import HttpResponse
 from xhtml2pdf import pisa
+
+from .models import Product, Category, OrderItem, Order, Payment, Coupon, Address
+from .forms import CouponForm, CheckoutForm
 from .utils import random_string_generator
 
-# stripe.api_key = 'sk_test_51IWcUlH2WUN2XCq1cM00PM5AOtkcShLPtwl1bg5C1SxYwJL0g7Jl29UqzWt6qWyZvCcqkApZV3U2aXxq2ZJRTXHC00n6nvgzbm'
+
 stripe.api_key = 'sk_test_51IXi0FSDx5m6eXW3KfjVvvE6Rf0YSo0qCNkvalLxYvmJZ6yozVZEkvJejNo3Fe6VkQ4Js1gGL3cfY4ssEGrcQVs400oRZwpHDg'
-class OrderSummaryView(LoginRequiredMixin, View):
-    def get(self, *args, **kwargs):
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            context = {
-                'object': order,
-                'couponform': CouponForm(),
-            }
-            return render(self.request, 'order_summary.html', context)
-        except ObjectDoesNotExist:
-            messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+
 
 class HomePage(View):
     def get(self, *args, **kwargs):
@@ -49,53 +39,6 @@ class HomePage(View):
 
         return render(self.request, 'homePage.html', context)
 
-# def homePageFunction (request):
-#     products_list = Product.objects.all()
-#     page = request.GET.get('page', 1)
-#     paginator = Paginator(products_list, 6)
-#
-#     try:
-#         products = paginator.page(page)
-#     except PageNotAnInteger:
-#         products = paginator.page(1)
-#     except EmptyPage:
-#         products = paginator.page(paginator.num_pages)
-#
-#     context = {
-#         'products': products
-#     }
-#     return render (request, 'homePage.html', context)
-
-
-class ProductDetail(View):
-    def get(self, *args, **kwargs):
-        product = get_object_or_404(Product, slug=kwargs['slug'])
-
-        related_products = list(product.category.products.exclude(id=product.id))
-
-        if len(related_products) > 4:
-            related_products = random.sample(related_products, 4)
-
-        context = {'product':product, 'related_products': related_products}
-
-        return render (self.request, 'productPage.html', context)
-
-
-# def productDetailFunction(request, category_slug, slug):
-#
-#     product = get_object_or_404(Product, slug=slug)
-#
-#     related_products = list(product.category.products.exclude(id=product.id))
-#
-#     if len(related_products) > 4:
-#         related_products = random.sample(related_products, 4)
-#
-#     context = {
-#     'product':product,
-#     'related_products': related_products
-#     }
-#
-#     return render (request, 'productPage.html', context)
 
 class CategoryDetail(View):
     def get(self, *args, **kwargs):
@@ -116,24 +59,20 @@ class CategoryDetail(View):
         }
         return render (self.request, 'homePage.html', context)
 
-# def categoryDetailFunction(request, slug):
-#
-#     category = get_object_or_404(Category, slug = slug)
-#     products_list = category.products.all()
-#     page = request.GET.get('page', 1)
-#     paginator = Paginator(products_list, 6)
-#
-#     try:
-#         products = paginator.page(page)
-#     except PageNotAnInteger:
-#         products = paginator.page(1)
-#     except EmptyPage:
-#         products = paginator.page(paginator.num_pages)
-#
-#     context = {
-#         'products': products
-#     }
-#     return render (request, 'homePage.html', context)
+
+class ProductDetail(View):
+    def get(self, *args, **kwargs):
+        product = get_object_or_404(Product, slug=kwargs['slug'])
+
+        related_products = list(product.category.products.exclude(id=product.id))
+
+        if len(related_products) > 4:
+            related_products = random.sample(related_products, 4)
+
+        context = {'product':product, 'related_products': related_products}
+
+        return render (self.request, 'productPage.html', context)
+
 
 @login_required
 def add_to_cart(request, category_slug, slug):
@@ -151,20 +90,18 @@ def add_to_cart(request, category_slug, slug):
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "This item quantity was updated.")
-            # return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
             return redirect("website:order-summary")
         else:
             order.items.add(order_item)
             messages.info(request, "This item was added to your cart.")
-            # return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
             return redirect("website:order-summary")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
         messages.info(request, "This item was added to your cart.")
-        # return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
         return redirect("website:order-summary")
+
 
 @login_required
 def remove_single_item_from_cart(request, category_slug, slug):
@@ -207,7 +144,6 @@ def remove_single_item_from_cart(request, category_slug, slug):
                     return redirect("website:homePage")
 
             return redirect("website:order-summary")
-            # return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
         else:
             messages.info(request, "This item was not in your cart")
             return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
@@ -258,14 +194,79 @@ def remove_from_cart(request, category_slug, slug):
         messages.info(request, "You do not have an active order")
         return redirect("website:product", category_slug = category_slug,  slug=slug)
 
-def is_valid_form(values):
-    for field in values:
-        if field == '':
-            return False
-    return True
+
+class OrderSummaryView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            context = {
+                'object': order,
+                'couponform': CouponForm(),
+            }
+            return render(self.request, 'order_summary.html', context)
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "You do not have an active order")
+            return redirect("/")
+
+
+class AddCouponView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        return redirect("/")
+
+    def post(self, *args, **kwargs):
+        form = CouponForm(self.request.POST or None)
+        if form.is_valid():
+            try:
+                code = form.cleaned_data.get('code')
+                order = Order.objects.get(user=self.request.user, ordered=False)
+                try:
+                     coupon = Coupon.objects.get(coupon_code=code)
+
+                     if not coupon.active:
+                         messages.info(self.request, "Coupon is NOT Active")
+                         return redirect("website:order-summary")
+
+                     couponDiscount = coupon.amount
+
+                     if order.get_total_without_coupon() - couponDiscount < 0:
+                         messages.info(self.request, "Coupon not valid for this Bill Amount")
+                         return redirect("website:order-summary")
+
+                except ObjectDoesNotExist:
+                    messages.info(self.request, "This coupon does not exist")
+                    return redirect("website:order-summary")
+
+                couponDiscount
+
+                order.coupon = coupon
+                order.save()
+                messages.success(self.request, "Successfully added coupon")
+                return redirect("website:order-summary")
+            except ObjectDoesNotExist:
+                messages.info(self.request, "You do not have an active order")
+                return redirect("/")
+        messages.info(self.request, "Some Error has been encountered. Please contact owner.")
+        return redirect("website:order-summary")
+
+
+class RemoveCouponView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            if not order.coupon:
+                messages.info(self.request, "Coupon was not applied")
+                return redirect("website:order-summary")
+
+            order.coupon = None
+            order.save()
+            messages.info(self.request, "Coupon removed Successfully")
+            return redirect("website:order-summary")
+        except ObjectDoesNotExist:
+            messages.info(self.request, "You do not have an active order")
+            return redirect("/")
+
 
 class CheckoutView(LoginRequiredMixin, View):
-
     def get(self, *args, **kwargs):
         try:
             order = Order.objects.get(user=self.request.user, ordered=False)
@@ -295,6 +296,12 @@ class CheckoutView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
+
+    def is_valid_form(self, values):
+        for field in values:
+            if field == '':
+                return False
+        return True
 
     def post(self, *args, **kwargs):
         form = CheckoutForm(self.request.POST or None)
@@ -333,7 +340,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     shipping_state = cleaned_data.get('shipping_state')
                     shipping_zip = cleaned_data.get('shipping_zip')
 
-                    if is_valid_form([shipping_address_1, shipping_address_2, shipping_city, shipping_state, shipping_zip]):
+                    if self.is_valid_form([shipping_address_1, shipping_address_2, shipping_city, shipping_state, shipping_zip]):
                         shipping_address = Address(
                             user=self.request.user,
                             address_1=shipping_address_1,
@@ -344,9 +351,7 @@ class CheckoutView(LoginRequiredMixin, View):
                             address_type='S'
                         )
 
-
                         set_default_shipping = cleaned_data.get('set_default_shipping')
-
 
                         if set_default_shipping:
                             address_qs = Address.objects.filter(
@@ -404,11 +409,6 @@ class CheckoutView(LoginRequiredMixin, View):
                     address_type='B'
                     )
 
-                    # billing_address = shipping_address
-                    # billing_address.pk = None
-
-                    # billing_address.save()
-                    # billing_address.address_type = 'B'
                     billing_address.save()
 
                     order.shipping_address = shipping_address
@@ -424,7 +424,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     billing_state = cleaned_data.get('billing_state')
                     billing_zip = cleaned_data.get('billing_zip')
 
-                    if is_valid_form([billing_address_1, billing_address_2, billing_city, billing_state, billing_zip]):
+                    if self.is_valid_form([billing_address_1, billing_address_2, billing_city, billing_state, billing_zip]):
 
                         billing_address = Address(
                             user=self.request.user,
@@ -477,6 +477,7 @@ class CheckoutView(LoginRequiredMixin, View):
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
 
+
 class PaymentView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         try:
@@ -494,10 +495,14 @@ class PaymentView(LoginRequiredMixin, View):
             return redirect("/")
         return redirect("/")
 
-
     def post(self, *args, **kwargs):
-        order = Order.objects.get(user=self.request.user, ordered=False)
-        amount = int(order.get_total() * 100)
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "You do not have an active order")
+            return redirect("website:homePage")
+
+        amount = int(order.get_grand_total() * 100)
         token = self.request.POST.get('stripeToken')
 
         try:
@@ -510,7 +515,7 @@ class PaymentView(LoginRequiredMixin, View):
             payment = Payment()
             payment.stripe_charge_id = charge['id']
             payment.user = self.request.user
-            payment.amount = order.get_total()
+            payment.amount = order.get_grand_total()
             payment.save()
 
             order_items = order.items.all()
@@ -543,17 +548,6 @@ class PaymentView(LoginRequiredMixin, View):
                         break
 
             order.order_unique_num = temp_num
-
-            #order.save()
-            # if not order.shipping_address.used :
-            #     order.shipping_address.used = not order.shipping_address.used
-            #     print(f' shipping_address.used = {order.shipping_address.used}')
-            #     order.shipping_address.save()
-            #
-            # if not order.billing_address.used :
-            #     order.billing_address.used = not order.billing_address.used
-            #     print(f' billing_address.used = {order.billing_address.used}')
-            #     order.billing_address.save()
 
             order.save()
 
@@ -601,55 +595,15 @@ class PaymentView(LoginRequiredMixin, View):
                 self.request, "A serious error occurred. We have been notifed.")
             return redirect("/")
 
-class AddCouponView(LoginRequiredMixin, View):
-    def get(self, *args, **kwargs):
-        return redirect("/")
 
-    def post(self, *args, **kwargs):
-        form = CouponForm(self.request.POST or None)
-        if form.is_valid():
-            try:
-                code = form.cleaned_data.get('code')
-                order = Order.objects.get(user=self.request.user, ordered=False)
-                try:
-                     coupon = Coupon.objects.get(coupon_code=code)
-                     couponDiscount = Coupon.objects.get(coupon_code = code).amount
-
-                     if order.get_total_without_coupon() - couponDiscount < 0:
-                         messages.info(self.request, "Coupon not valid for this Bill Amount")
-                         return redirect("website:order-summary")
-
-                except ObjectDoesNotExist:
-                    messages.info(self.request, "This coupon does not exist")
-                    return redirect("website:order-summary")
-
-                couponDiscount
-
-                order.coupon = coupon
-                order.save()
-                messages.success(self.request, "Successfully added coupon")
-                return redirect("website:order-summary")
-            except ObjectDoesNotExist:
-                messages.info(self.request, "You do not have an active order")
-                return redirect("/")
-        messages.info(self.request, "Some Error has been encountered. Please contact owner.")
-        return redirect("website:order-summary")
-
-class RemoveCouponView(LoginRequiredMixin, View):
-    def get(self, *args, **kwargs):
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            if not order.coupon:
-                messages.info(self.request, "Coupon was not applied")
-                return redirect("website:order-summary")
-
-            order.coupon = None
-            order.save()
-            messages.info(self.request, "Coupon removed Successfully")
-            return redirect("website:order-summary")
-        except ObjectDoesNotExist:
-            messages.info(self.request, "You do not have an active order")
-            return redirect("/")
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html  = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
 
 
 class ViewBillPdf(LoginRequiredMixin, View):
@@ -681,18 +635,7 @@ class ViewBillPdf(LoginRequiredMixin, View):
         except:
             messages.info(self.request, "Contact Dev since bill not there")
             return redirect("website:homePage")
-        # return redirect("website:homePage")
 
-
-
-def render_to_pdf(template_src, context_dict={}):
-    template = get_template(template_src)
-    html  = template.render(context_dict)
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
-    return None
 
 class PastOrders(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

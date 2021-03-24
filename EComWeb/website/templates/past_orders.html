@@ -1,47 +1,29 @@
 {% extends "base.html" %}
-
 {% block content %}
 <main>
-  <div class="container mt-5">
-    {% for order in orders %}
-    <a href="{% url 'website:bill_pdf_view' order.order_unique_num %}" target="_blank" style="color: inherit;">
-    <div class="card">
-      <div class="card-body text-center green lighten-5" style="font-size: 110%;">
-        <span>Order id = <b style="font-size: 125%; background: inherit">{{order.order_unique_num}}</b></span><br>
-        <span>{{order.ordered_date}}</span><br>
-        <span>Amount Paid: ₹  {{order.payment.amount}}</span><br>
-        <span>Status:
-          <b style="font-size: 110%; background: inherit">
-          {% if order.delivered %}
-          Delivered
-          {% else %}
-          Processing
-          {% endif %}
-          </b>
-        </span>
-      </div>
-    </div>
-    </a>
-    <br>
-    <br>
-    {% endfor %}
-  </div>
+   <div class="container mt-5">
+      {% for order in orders %}
+      <a href="{% url 'website:bill_pdf_view' order.order_unique_num %}" target="_blank" style="color: inherit;">
+         <div class="card">
+            <div class="card-body text-center yellow lighten-1" style="font-size: 110%;">
+               <span>Order id = <b style="font-size: 125%; background: inherit">{{order.order_unique_num}}</b></span><br>
+               <span>{{order.ordered_date}}</span><br>
+               <span>Amount Paid: ₹  {{order.payment.amount}}</span><br>
+               <span>Status:
+               <b style="font-size: 110%; background: inherit">
+               {% if order.delivered %}
+               Delivered
+               {% else %}
+               Processing
+               {% endif %}
+               </b>
+               </span>
+            </div>
+         </div>
+      </a>
+      <br>
+      <br>
+      {% endfor %}
+   </div>
 </main>
-
 {% endblock content %}
-
-
-<div class="card">
-  <!--Card image-->
-  <!-- <div class="view overlay">
-    <img class="card-img-top" src="{{product.img.url}}">
-    <a href="{{product.get_absolute_url}}"  >
-      <div class="mask rgba-white-slight"></div>
-    </a>
-  </div> -->
-  <!--Card image-->
-  <!--Card content-->
-  <div class="card-body text-center pink lighten-5">
-  </div>
-  <!--Card content-->
-</div>

@@ -160,5 +160,4 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 ACCOUNT_FORMS = {
     'signup': 'website.forms.CustomSignupForm',
-    #'login' : 'website.forms.CustomLoginForm',
 }
