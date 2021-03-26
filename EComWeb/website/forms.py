@@ -7,11 +7,11 @@ class CustomSignupForm(SignupForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        del self.fields["email"]
+        #del self.fields["email"]
 
         self.fields["password2"].widget.attrs["placeholder"] = "Confirm Password"
         self.fields["password2"].label = "Confirm Password"
-        
+
     def signup(self, request, user):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
