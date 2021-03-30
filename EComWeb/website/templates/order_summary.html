@@ -28,7 +28,7 @@
                      {%endif %}
                   </td>
                   <td>
-                     <a href="{% url 'website:remove_single_from_cart' order_item.item.category.slug order_item.item.slug %}"><i class="fas fa-minus mr-2"></i></a>
+                     <a href="{% url 'website:remove_single_item_from_cart' order_item.item.category.slug order_item.item.slug %}"><i class="fas fa-minus mr-2"></i></a>
                      {{ order_item.quantity }}
                      <a href="{% url 'website:add_to_cart' order_item.item.category.slug order_item.item.slug %}"><i class="fas fa-plus ml-2"></i></a>
                   </td>
@@ -76,7 +76,7 @@
                </tr>
                <tr>
                   <td colspan="5">
-                     <form class="card p-2 float-right ml-2" action="{% url 'website:add-coupon' %}" method="POST">
+                     <form class="card p-2 float-right ml-2" action="{% url 'website:add_coupon' %}" method="POST">
                         {% csrf_token %}
                         <div class="input-group">
                            {{ couponform.code }}

@@ -45,7 +45,7 @@ class CategoryDetail(View):
         category = get_object_or_404(Category, slug = kwargs['slug'])
         products_list = category.products.all()
         page = self.request.GET.get('page', 1)
-        paginator = Paginator(products_list, 6)
+        paginator = Paginator(products_list, 8)
 
         try:
             products = paginator.page(page)
@@ -141,19 +141,19 @@ def remove_single_item_from_cart(request, category_slug, slug):
 
                     messages.info(request, "Cart has been emptied.")
                     order.delete()
-                    return redirect("website:homePage")
+                    return redirect("website:home_page")
 
             return redirect("website:order-summary")
         else:
             messages.info(request, "This item was not in your cart")
-            return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
+            return redirect("website:product_detail", slug = slug, category_slug = category_slug)
     else:
         messages.info(request, "You do not have an active order")
-        return redirect("website:productDetailFunction", slug = slug, category_slug = category_slug)
+        return redirect("website:product_detail", slug = slug, category_slug = category_slug)
 
 
 @login_required
-def remove_from_cart(request, category_slug, slug):
+def remove_entire_from_cart(request, category_slug, slug):
     item = get_object_or_404(Product, slug=slug)
     order_qs = Order.objects.filter(user=request.user, ordered=False)
 
@@ -183,16 +183,16 @@ def remove_from_cart(request, category_slug, slug):
                             order.billing_address.delete()
 
                     order.delete()
-                    return redirect("website:homePage")
+                    return redirect("website:home_page")
 
             messages.info(request, "This item was removed from your cart.")
             return redirect("website:order-summary")
         else:
             messages.info(request, "This item was not in your cart")
-            return redirect("website:product", category_slug = category_slug, slug=slug)
+            return redirect("website:product_detail", category_slug = category_slug, slug=slug)
     else:
         messages.info(request, "You do not have an active order")
-        return redirect("website:product", category_slug = category_slug,  slug=slug)
+        return redirect("website:product_detail", category_slug = category_slug,  slug=slug)
 
 
 class OrderSummaryView(LoginRequiredMixin, View):
@@ -206,12 +206,12 @@ class OrderSummaryView(LoginRequiredMixin, View):
             return render(self.request, 'order_summary.html', context)
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+            return redirect("website:home_page")
 
 
 class AddCouponView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
-        return redirect("/")
+        return redirect("website:home_page")
 
     def post(self, *args, **kwargs):
         form = CouponForm(self.request.POST or None)
@@ -244,7 +244,7 @@ class AddCouponView(LoginRequiredMixin, View):
                 return redirect("website:order-summary")
             except ObjectDoesNotExist:
                 messages.info(self.request, "You do not have an active order")
-                return redirect("/")
+                return redirect("website:home_page")
         messages.info(self.request, "Some Error has been encountered. Please contact owner.")
         return redirect("website:order-summary")
 
@@ -263,7 +263,7 @@ class RemoveCouponView(LoginRequiredMixin, View):
             return redirect("website:order-summary")
         except ObjectDoesNotExist:
             messages.info(self.request, "You do not have an active order")
-            return redirect("/")
+            return redirect("website:home_page")
 
 
 class CheckoutView(LoginRequiredMixin, View):
@@ -295,7 +295,7 @@ class CheckoutView(LoginRequiredMixin, View):
             return render(self.request, 'checkout.html', context)
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+            return redirect("website:home_page")
 
     def is_valid_form(self, values):
         for field in values:
@@ -475,7 +475,7 @@ class CheckoutView(LoginRequiredMixin, View):
                 return redirect("website:payment")
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+            return redirect("website:home_page")
 
 
 class PaymentView(LoginRequiredMixin, View):
@@ -492,15 +492,15 @@ class PaymentView(LoginRequiredMixin, View):
             return render(self.request, "payment.html", context = context)
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
-        return redirect("/")
+            return redirect("website:home_page")
+        return redirect("website:home_page")
 
     def post(self, *args, **kwargs):
         try:
             order = Order.objects.get(user=self.request.user, ordered=False)
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
-            return redirect("website:homePage")
+            return redirect("website:home_page")
 
         amount = int(order.get_grand_total() * 100)
         token = self.request.POST.get('stripeToken')
@@ -558,42 +558,37 @@ class PaymentView(LoginRequiredMixin, View):
             body = e.json_body
             err = body.get('error', {})
             messages.warning(self.request, f"{err.get('message')}")
-            return redirect("/")
+            return redirect("website:home_page")
         #
         except stripe.error.RateLimitError as e:
             # Too many requests made to the API too quickly
             messages.warning(self.request, "Rate limit error")
-            return redirect("/")
+            return redirect("website:home_page")
 
         except stripe.error.InvalidRequestError as e:
             # Invalid parameters were supplied to Stripe's API
             print(e)
             messages.warning(self.request, "Invalid parameters")
-            return redirect("/")
+            return redirect("website:home_page")
 
         except stripe.error.AuthenticationError as e:
             # Authentication with Stripe's API failed
             # (maybe you changed API keys recently)
             messages.warning(self.request, "Not authenticated")
-            return redirect("/")
+            return redirect("website:home_page")
 
         except stripe.error.APIConnectionError as e:
             # Network communication with Stripe failed
             messages.warning(self.request, "Network error")
-            return redirect("/")
+            return redirect("website:home_page")
 
         except stripe.error.StripeError as e:
-            # Display a very generic error to the user, and maybe send
-            # yourself an email
-            messages.warning(
-                self.request, "Something went wrong. You were not charged. Please try again.")
-            return redirect("/")
+            messages.warning(self.request, "Something went wrong. You were not charged. Please try again.")
+            return redirect("website:home_page")
 
         except Exception as e:
-            # send an email to ourselves
-            messages.warning(
-                self.request, "A serious error occurred. We have been notifed.")
-            return redirect("/")
+            messages.warning(self.request, "A serious error occurred. We have been notifed.")
+            return redirect("website:home_page")
 
 
 def render_to_pdf(template_src, context_dict={}):
@@ -631,10 +626,10 @@ class ViewBillPdf(LoginRequiredMixin, View):
                     return response
                 return response
             else:
-                return redirect("website:homePage")
+                return redirect("website:home_page")
         except:
             messages.info(self.request, "Contact Dev since bill not there")
-            return redirect("website:homePage")
+            return redirect("website:home_page")
 
 
 class PastOrders(LoginRequiredMixin, View):
@@ -643,7 +638,7 @@ class PastOrders(LoginRequiredMixin, View):
             orders_all = Order.objects.filter(user=self.request.user, ordered=True).order_by('-ordered_date')
         except ObjectDoesNotExist:
             messages.info(self.request, "Some Error has occurred, we have been sent an email")
-            return redirect("/")
+            return redirect("website:home_page")
 
         context = {"orders" : orders_all}
 

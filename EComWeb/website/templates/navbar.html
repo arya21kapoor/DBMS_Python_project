@@ -2,41 +2,18 @@
 {% load cart_template_tags %}
 <nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
    <div class="container">
-      <!-- Brand -->
-      <a class="navbar-brand waves-effect" href="{% url 'website:homePage' %}">
-      <strong class="blue-text" >Bakery Shop</strong>
+      <a class="navbar-brand waves-effect" href="{% url 'website:home_page' %}">
+      <span class="blue-text" style="font-size: 125%; background: inherit; font-weight: bold">Royal Bakery</span>
       </a>
-      <!-- Collapse -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
       </button>
-      <!-- Links -->
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-         <!-- Left -->
-         <ul class="navbar-nav mr-auto">
-            {% comment %}
-            <li class="nav-item active">
-               <a class="nav-link waves-effect" href="#">Home
-               <span class="sr-only">(current)</span>
-               </a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link waves-effect" href="#" target="_blank">About MDB</a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link waves-effect" href="#"
-                  target="_blank">Free download</a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link waves-effect" href="#" target="_blank">Free
-               tutorials</a>
-            </li>
-            {% endcomment %}
-         </ul>
-         <!-- Right -->
+         <ul class="navbar-nav mr-auto"></ul>
          <ul class="navbar-nav nav-flex-icons">
             {% if request.user.is_authenticated %}
+            <!-- if a returning customer or a registered user is using the website -->
             <li class="nav-item">
                <a href="{% url 'website:order-summary' %}"class="nav-link waves-effect">
                <span class="badge red z-depth-1 mr-1"> {{request.user|cart_item_count}} </span>
@@ -44,7 +21,6 @@
                <span class="clearfix d-none d-sm-inline-block mr-2 "> Cart </span>
                </a>
             </li>
-            <!-- style="background-color:yellow;" -->
             {% if request.user|past_orders_present %}
             <li class="nav-item mr-2">
                <a class="nav-link waves-effect" href="{% url 'website:past-orders' %}">
@@ -58,6 +34,7 @@
                </a>
             </li>
             {% else %}
+            <!-- if an anonymous user or a new user is using the website -->
             <li class="nav-item">
                <a class="nav-link waves-effect mr-2" href="{% url 'account_login' %}">
                <span class="clearfix d-none d-sm-inline-block"> Login </span>

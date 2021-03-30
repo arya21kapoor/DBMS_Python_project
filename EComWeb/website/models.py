@@ -21,7 +21,7 @@ class Product(models.Model):
     discounted_price = models.FloatField(blank = True, null = True)
     category = models.ForeignKey(Category, related_name = "products", on_delete = models.CASCADE, default = 0)
     slug = models.SlugField(default = "test-product", unique = True)
-    description = models.TextField(default = " Please enter the description about the product. It should give an overview about the product, how popular the product is and so on..")
+    description = models.TextField(default = "Please enter the description about the product. It should give an overview about the product, how popular the product is and so on..")
 
     def __str__(self):
         return self.title

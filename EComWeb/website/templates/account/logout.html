@@ -1,21 +1,15 @@
 {% extends "base.html" %}
-
 {% load i18n %}
-
 {% block head_title %}{% trans "Log Out" %}{% endblock %}
-
 {% block content %}
 
 <main>
   <div class="container">
     <section class="mb-4 mt-6">
-      <!--Grid row-->
       <div class="row wow fadeIn">
         <div class="col-6 offset-3">
           <h1>{% trans "Log Out" %}</h1>
-
           <p>{% trans 'Are you sure you want to log out?' %}</p>
-
           <form method="post" action="{% url 'account_logout' %}">
             {% csrf_token %}
             {% if redirect_field_value %}

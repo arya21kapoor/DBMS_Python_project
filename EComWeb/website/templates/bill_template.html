@@ -60,6 +60,8 @@
       <div class="container">
          <div class="card">
             <div class="card-header">
+               <span class="blue-text" style="font-size: 400%; background: inherit; font-weight: bold">Royal Bakery</span>
+               <br><br><br>
                <span style="font-size: 175%; background: inherit; font-weight: bold">Bill Report for Order ID: {{order.order_unique_num}}</span><br><br>
                <span style="font-size: 150%; background: inherit; font-weight: bold">{{ order.ordered_date}}</span>
                <br>
@@ -170,6 +172,8 @@
                   {% endif %}
                </tbody>
             </table>
+            <span style="font-size: 120%; background: inherit;">*Amount inclusive of all taxes</span>
+            <br>
             <br>
             <span style="font-size: 150%; background: inherit;">Amount : &nbsp;</span>
             {%if order.payment %}

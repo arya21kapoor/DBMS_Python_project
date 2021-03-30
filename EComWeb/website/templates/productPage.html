@@ -47,7 +47,7 @@
             <a class="btn btn-primary btn-md my-0 p" href="{% url 'website:add_to_cart' product.category.slug product.slug %}">Add to cart
             <i class="fas fa-shopping-cart ml-1"></i>
             </a>
-            <a class="btn btn-danger btn-md my-0 p" href="{% url 'website:remove_single_from_cart' product.category.slug product.slug %}">Remove from Cart
+            <a class="btn btn-danger btn-md my-0 p" href="{% url 'website:remove_single_item_from_cart' product.category.slug product.slug %}">Remove from Cart
             <i class="fas fa-shopping-cart ml-1"></i>
             </a>
          </div>
