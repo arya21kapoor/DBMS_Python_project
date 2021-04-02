@@ -16,6 +16,9 @@
       <div class="collapse navbar-collapse" id="basicExampleNav">
          <!-- Links -->
          <ul class="navbar-nav mr-auto">
+           <li class="nav-item">
+              <a class="nav-link" href="{% url 'website:home_page' %}">All</a>
+           </li>
             {% for category in menu_categories %}
             <li class="nav-item">
                <a class="nav-link" href="{% url 'website:category_detail' category.slug %}">{{category}}</a>
