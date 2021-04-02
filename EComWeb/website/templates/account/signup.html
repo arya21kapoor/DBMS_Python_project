@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block head_title %}{% trans "Signup" %}{% endblock %}
 {% block content %}
@@ -7,6 +8,9 @@
   <div class="container">
     <section class="mb-4 mt-6">
       <div class="row wow fadeIn">
+        <div class="col-1">
+          <img src="{% static 'website/bakery_logo_2.png' %}"  alt="">
+        </div>
         <div class="col-6 offset-3">
           <h1>{% trans "Sign Up" %}</h1>
           <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">log in</a>.{% endblocktrans %}</p>
